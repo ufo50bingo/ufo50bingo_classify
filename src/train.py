@@ -1,18 +1,18 @@
 import keras
 
-IMG_SIZE = 224
+TARGET_SIZE = (320, 180)  # model input size (square)
 BATCH_SIZE = 32
 NUM_CLASSES = 52
 
 train_ds = keras.utils.image_dataset_from_directory(
     "dataset/train",
-    image_size=(IMG_SIZE, IMG_SIZE),
+    image_size=TARGET_SIZE,
     batch_size=BATCH_SIZE,
 )
 
 val_ds = keras.utils.image_dataset_from_directory(
     "dataset/val",
-    image_size=(IMG_SIZE, IMG_SIZE),
+    image_size=TARGET_SIZE,
     batch_size=BATCH_SIZE,
 )
 
@@ -33,12 +33,12 @@ data_aug = keras.Sequential(
 )
 
 base_model = keras.applications.MobileNetV2(
-    input_shape=(IMG_SIZE, IMG_SIZE, 3), include_top=False, weights="imagenet"
+    input_shape=(320, 180, 3), include_top=False, weights="imagenet"
 )
 
 base_model.trainable = False
 
-inputs = keras.Input(shape=(IMG_SIZE, IMG_SIZE, 3))
+inputs = keras.Input(shape=(320, 180, 3))
 
 x = data_aug(inputs)
 x = keras.applications.mobilenet_v2.preprocess_input(x)
