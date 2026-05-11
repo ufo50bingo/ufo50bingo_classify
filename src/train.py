@@ -1,28 +1,29 @@
 import keras
+import tensorflow as tf
+
+from distort import augment_dataset, load_image
 
 TARGET_SIZE = (320, 180)  # model input size (square)
 BATCH_SIZE = 32
 NUM_CLASSES = 52
 
-train_ds = keras.utils.image_dataset_from_directory(
-    "dataset/train",
+train_ds, val_ds = keras.utils.image_dataset_from_directory(
+    "frames/",
     image_size=TARGET_SIZE,
     batch_size=BATCH_SIZE,
+    validation_split=0.2,
+    interpolation="nearest",
+    subset="both",
+    seed=12345,
 )
 
-val_ds = keras.utils.image_dataset_from_directory(
-    "dataset/val",
-    image_size=TARGET_SIZE,
-    batch_size=BATCH_SIZE,
-)
+train_ds = augment_dataset(train_ds)
+val_ds = augment_dataset(val_ds)
 
 class_names = train_ds.class_names  # type: ignore
 print("Classes:", class_names)
 
 AUTOTUNE = keras.utils.PrefetchDataset  # type: ignore
-
-train_ds = train_ds.prefetch(AUTOTUNE)  # type: ignore
-val_ds = val_ds.prefetch(AUTOTUNE)  # type: ignore
 
 data_aug = keras.Sequential(
     [

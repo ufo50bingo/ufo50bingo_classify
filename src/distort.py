@@ -194,11 +194,12 @@ def augment(img):
     return img
 
 
-def load_image(path, label):
+def load_image(img, label):
 
-    img = tf.io.read_file(path)
+    # print("path is", path)
+    # img = tf.io.read_file(path)
 
-    img = tf.io.decode_jpeg(img, channels=3)
+    # img = tf.io.decode_jpeg(img, channels=3)
 
     img = tf.cast(img, tf.float32)
 
@@ -209,41 +210,38 @@ def load_image(path, label):
     return img, label
 
 
-raw = tf.io.read_file("seasidedrive.png")
-# raw = tf.io.decode_jpeg(raw, channels=3)
-raw = tf.io.decode_png(raw, channels=3)
-raw = tf.cast(raw, tf.float32)
-fig, axes = plt.subplots(4, 4, figsize=(12, 8))
+# raw = tf.io.read_file("seasidedrive.png")
+# # raw = tf.io.decode_jpeg(raw, channels=3)
+# raw = tf.io.decode_png(raw, channels=3)
+# raw = tf.cast(raw, tf.float32)
+# fig, axes = plt.subplots(4, 4, figsize=(12, 8))
 
-for ax in axes.flatten():
+# for ax in axes.flatten():
 
-    aug = augment(raw)
+#     aug = augment(raw)
 
-    aug = tf.clip_by_value(aug / 255.0, 0, 1)
+#     aug = tf.clip_by_value(aug / 255.0, 0, 1)
 
-    ax.imshow(aug.numpy())
+#     ax.imshow(aug.numpy())
 
-    ax.axis("off")
+#     ax.axis("off")
 
-plt.tight_layout()
+# plt.tight_layout()
 
-plt.savefig("same_frame_augments.png")
+# plt.savefig("same_frame_augments.png")
 
 
-def get_dataset():
+# def get_dataset():
 
-    dataset = tf.data.Dataset.from_tensor_slices((paths, labels))
+#     dataset = tf.data.Dataset.from_tensor_slices((paths, labels))
 
+
+def augment_dataset(dataset):
     dataset = dataset.shuffle(10000)
-
     dataset = dataset.map(load_image, num_parallel_calls=tf.data.AUTOTUNE)
-
     dataset = dataset.batch(BATCH_SIZE)
-
     dataset = dataset.prefetch(tf.data.AUTOTUNE)
-
     dataset = dataset.repeat()
-
     return dataset
 
 
