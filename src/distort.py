@@ -50,12 +50,11 @@ def aspect_ratio_distort(img):
 def jpeg_artifacts(img):
     img_uint8 = tf.cast(tf.clip_by_value(img, 0, 255), tf.uint8)
 
-    quality = tf.random.uniform([], 20, 70, dtype=tf.int32)
+    img_uint8 = tf.image.random_jpeg_quality(
+        img_uint8, min_jpeg_quality=20, max_jpeg_quality=70
+    )
 
-    encoded = tf.io.encode_jpeg(img_uint8, quality=quality)
-    decoded = tf.io.decode_jpeg(encoded)
-
-    return tf.cast(decoded, tf.float32)
+    return tf.cast(img_uint8, tf.float32)
 
 
 def stream_blur(img):
@@ -172,7 +171,7 @@ def augment(img):
 
     img = aspect_ratio_distort(img)
 
-    img = img = tf.image.resize(img, [IMG_HEIGHT, IMG_WIDTH], method="nearest")
+    img = tf.image.resize(img, [IMG_HEIGHT, IMG_WIDTH], method="nearest")
 
     if tf.random.uniform([]) < 0.8:
         img = jpeg_artifacts(img)
