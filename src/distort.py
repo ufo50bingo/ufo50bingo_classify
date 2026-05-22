@@ -105,11 +105,25 @@ def add_black_bars(img):
     bar_h = tf.cast(tf.cast(h, tf.float32) * pct, tf.int32)
     bar_w = tf.cast(tf.cast(w, tf.float32) * pct, tf.int32)
 
-    if tf.random.uniform([]) < 0.5:
-        img = tf.concat([tf.zeros([bar_h, w, 3]), img[bar_h:, :, :]], axis=0)
+    def add_top():
+        black = tf.zeros([bar_h, w, 3], dtype=img.dtype)
+        return tf.concat([black, img[bar_h:, :, :]], axis=0)
 
-    if tf.random.uniform([]) < 0.5:
-        img = tf.concat([img[:, :-bar_w, :], tf.zeros([h, bar_w, 3])], axis=1)
+    def add_right():
+        black = tf.zeros([h, bar_w, 3], dtype=img.dtype)
+        return tf.concat([img[:, :-bar_w, :], black], axis=1)
+
+    img = tf.cond(
+        tf.logical_and(tf.random.uniform([]) < 0.5, bar_h > 0),
+        add_top,
+        lambda: img,
+    )
+
+    img = tf.cond(
+        tf.logical_and(tf.random.uniform([]) < 0.5, bar_w > 0),
+        add_right,
+        lambda: img,
+    )
 
     return img
 

@@ -3,9 +3,9 @@ import tensorflow as tf
 
 from distort import augment, augment_dataset, load_image
 
-TARGET_SIZE = (320, 180)  # model input size (square)
+TARGET_SIZE = (180, 320)  # model input size (square)
 BATCH_SIZE = 32
-NUM_CLASSES = 56
+NUM_CLASSES = 50
 
 train_ds, val_ds = keras.utils.image_dataset_from_directory(
     "frames/",
@@ -17,25 +17,25 @@ train_ds, val_ds = keras.utils.image_dataset_from_directory(
     seed=12345,
 )
 
-# train_ds = train_ds.map(
-#     lambda x, y: (
-#         tf.map_fn(
-#             lambda img: augment(tf.cast(img, tf.float32)),
-#             x,
-#             fn_output_signature=tf.float32,
-#         ),
-#         y,
-#     ),
-#     num_parallel_calls=tf.data.AUTOTUNE,
-# )
+train_ds = train_ds.map(
+    lambda x, y: (
+        tf.map_fn(
+            lambda img: augment(tf.cast(img, tf.float32)),
+            x,
+            fn_output_signature=tf.float32,
+        ),
+        y,
+    ),
+    num_parallel_calls=tf.data.AUTOTUNE,
+)
 
 base_model = keras.applications.MobileNetV2(
-    input_shape=(320, 180, 3), include_top=False, weights="imagenet"
+    input_shape=(180, 320, 3), include_top=False, weights="imagenet"
 )
 
 base_model.trainable = False
 
-inputs = keras.Input(shape=(320, 180, 3))
+inputs = keras.Input(shape=(180, 320, 3))
 
 x = inputs
 x = keras.applications.mobilenet_v2.preprocess_input(x)
